@@ -183,14 +183,14 @@ properties, after each buffer modification, on the modified zone."
     (when font-lock-mode (font-lock-flush))
     (add-function :filter-return (local 'filter-buffer-substring-function)
                   #'markdown-indent-remove-properties-from-string)
-    (add-hook 'after-change-functions 'markdown-indent-refresh-maybe nil 'local)
+    (add-hook 'after-change-functions #'markdown-indent-refresh-maybe nil 'local)
     (markdown-indent-add-properties (point-min) (point-max)))
    (t
     (font-lock-remove-keywords nil markdown-indent--hide-hash-keywords)
     (when font-lock-mode (font-lock-flush))
     (remove-function (local 'filter-buffer-substring-function)
                      #'markdown-indent-remove-properties-from-string)
-    (remove-hook 'after-change-functions 'markdown-indent-refresh-maybe 'local)
+    (remove-hook 'after-change-functions #'markdown-indent-refresh-maybe 'local)
     (save-excursion
       (with-silent-modifications
         (remove-text-properties (point-min) (point-max) '(line-prefix nil wrap-prefix nil))))
