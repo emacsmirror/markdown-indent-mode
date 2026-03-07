@@ -29,6 +29,13 @@ When enabled, content under headings is visually indented to align with the head
 
 - `markdown-indent-mode` - Toggle the mode
 
+## Development
+
+```
+make test   # run ERT tests
+make lint   # run checkdoc on both .el files
+```
+
 ## How It Works
 
 This package works similarly to `org-indent-mode`:
