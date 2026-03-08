@@ -58,6 +58,34 @@ The foreground color matches the background to make hashes invisible."
 (defconst markdown-indent--fence-regexp "^\\(`\\{3,\\}\\|~\\{3,\\}\\)"
   "Regular expression matching the start or end of a code fence.")
 
+(defconst markdown-indent--list-item-regexp
+  "^[ \t]*\\(?:[-*+]\\|[0-9]+[.)]\\)[ \t]+"
+  "Regular expression matching a Markdown list item line.
+
+Pattern breakdown:
+  ^         start of line
+  [ \\t]*   zero or more leading spaces or tabs
+  \\(?:     non-capturing group:
+    [-*+]       unordered marker: -, *, or +
+    \\|         or
+    [0-9]+[.)]  ordered marker: digits followed by . or )
+  \\)
+  [ \\t]+   one or more spaces or tabs after the marker
+
+Examples that match (treated as list items):
+  \"- item\"       unordered with -
+  \"* item\"       unordered with *
+  \"+ item\"       unordered with +
+  \"  - item\"     indented unordered
+  \"1. item\"      ordered with dot
+  \"1) item\"      ordered with parenthesis
+  \"  10. item\"   indented multi-digit ordered
+
+Examples that do NOT match:
+  \"-item\"           no space after marker
+  \"  regular text\"  no list marker after leading spaces
+  \"*emphasized*\"    asterisk not followed by a space")
+
 (defconst markdown-indent--hide-hash-keywords
   '((markdown-indent--search-heading-hashes
      (1 'markdown-indent-mode-hide-hash prepend)
@@ -153,7 +181,11 @@ Advance to the next line."
                                       '(line-prefix nil wrap-prefix nil))
               (forward-line))
              (t
-              (markdown-indent-set-line-properties level (current-indentation))))))))))
+              (let ((body-column
+                     (if (looking-at markdown-indent--list-item-regexp)
+                         (- (match-end 0) (line-beginning-position))
+                       (current-indentation))))
+                (markdown-indent-set-line-properties level body-column))))))))))
 
 (defvar markdown-indent-mode)
 

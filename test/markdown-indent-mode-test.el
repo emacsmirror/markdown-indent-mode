@@ -52,6 +52,16 @@ LINE-NUMBER is 1-based."
     (let ((prop (get-text-property (point) 'line-prefix)))
       (if prop (substring-no-properties prop) ""))))
 
+(defun markdown-indent-mode-test-wrap-prefix (line-number)
+  "Return the plain string of the `wrap-prefix' property.
+
+LINE-NUMBER is 1-based."
+  (save-excursion
+    (goto-char (point-min))
+    (forward-line (1- line-number))
+    (let ((prop (get-text-property (point) 'wrap-prefix)))
+      (if prop (substring-no-properties prop) ""))))
+
 ;;; Initial indentation
 
 (ert-deftest markdown-indent-mode-test-no-heading ()
@@ -145,6 +155,36 @@ Fake headings inside don't change level."
     (search-forward "### ")
     (delete-char -1)                                                  ; delete the space
     (should (string= "" (markdown-indent-mode-test-line-prefix 2)))))     ; no longer a heading
+
+;;; List item wrap-prefix
+
+(ert-deftest markdown-indent-mode-test-list-item-wrap-prefix ()
+  "List item `wrap-prefix' aligns continuation with body (after marker)."
+  (markdown-indent-mode-test-with-buffer "# Heading\n- item\n"
+    ;; line-prefix for list item: 2 spaces (level 1)
+    (should (string= "  " (markdown-indent-mode-test-line-prefix 2)))
+    ;; wrap-prefix: 2 (level) + 2 (for "- ") = 4 spaces
+    (should (string= "    " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-list-item-nested-indent ()
+  "Indented list item `wrap-prefix' accounts for leading spaces and marker."
+  (markdown-indent-mode-test-with-buffer "# Heading\n  - item\n"
+    ;; line-prefix: 2 spaces (level 1)
+    (should (string= "  " (markdown-indent-mode-test-line-prefix 2)))
+    ;; wrap-prefix: 2 (level) + 4 (for "  - ") = 6 spaces
+    (should (string= "      " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-ordered-list-wrap-prefix ()
+  "Ordered list item `wrap-prefix' aligns continuation with body."
+  (markdown-indent-mode-test-with-buffer "# Heading\n1. item\n"
+    ;; wrap-prefix: 2 (level) + 3 (for "1. ") = 5 spaces
+    (should (string= "     " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-regular-text-wrap-prefix ()
+  "Regular text `wrap-prefix' equals `line-prefix' (no extra indentation)."
+  (markdown-indent-mode-test-with-buffer "# Heading\ncontent\n"
+    ;; wrap-prefix equals line-prefix for non-indented regular text
+    (should (string= "  " (markdown-indent-mode-test-wrap-prefix 2)))))
 
 ;;; Mode disable
 

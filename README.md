@@ -2,8 +2,8 @@
 
 An Emacs minor mode for dynamic virtual indentation in Markdown, similar to `org-indent-mode` in Org mode.
 
-| Off | On |
-|-----|----|
+| Before | After |
+|--------|-------|
 | ![markdown-indent-mode off](markdown-indent-mode-off.png) | ![markdown-indent-mode on](markdown-indent-mode-on.png) |
 
 ## Features
