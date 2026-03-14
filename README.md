@@ -4,7 +4,7 @@ An Emacs minor mode for dynamic virtual indentation in Markdown, similar to `org
 
 | Before | After |
 |--------|-------|
-| ![markdown-indent-mode off](markdown-indent-mode-off.png) | ![markdown-indent-mode on](markdown-indent-mode-on.png) |
+| ![markdown-indent-mode off](screenshots/markdown-indent-mode-off.png) | ![markdown-indent-mode on](screenshots/markdown-indent-mode-on.png) |
 
 ## Features
 
