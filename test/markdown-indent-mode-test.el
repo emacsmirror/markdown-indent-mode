@@ -186,6 +186,41 @@ Fake headings inside don't change level."
     ;; wrap-prefix equals line-prefix for non-indented regular text
     (should (string= "  " (markdown-indent-mode-test-wrap-prefix 2)))))
 
+;;; Blockquote wrap-prefix
+
+(ert-deftest markdown-indent-mode-test-blockquote-wrap-prefix ()
+  "Blockquote `wrap-prefix' uses `> ' continuation marker."
+  (markdown-indent-mode-test-with-buffer "# Heading\n> quote\n"
+    (should (string= "  " (markdown-indent-mode-test-line-prefix 2)))
+    ;; wrap-prefix: 2 spaces (level 1) + "> "
+    (should (string= "  > " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-blockquote-no-space-wrap-prefix ()
+  "Blockquote with no trailing space still uses `> ' continuation marker."
+  (markdown-indent-mode-test-with-buffer "# Heading\n>quote\n"
+    ;; wrap-prefix: 2 spaces (level 1) + "> "
+    (should (string= "  > " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-blockquote-indented-wrap-prefix ()
+  "Indented blockquote includes leading spaces in continuation."
+  (markdown-indent-mode-test-with-buffer "# Heading\n  > quote\n"
+    ;; wrap-prefix: 2 spaces (level 1) + "  > " (2 leading spaces + "> ")
+    (should (string= "    > " (markdown-indent-mode-test-wrap-prefix 2)))))
+
+(ert-deftest markdown-indent-mode-test-list-item-wrap-prefix-no-heading ()
+  "List item `wrap-prefix' aligns continuation even with no heading."
+  (markdown-indent-mode-test-with-buffer "  - item\n"
+    (should (string= "" (markdown-indent-mode-test-line-prefix 1)))
+    ;; wrap-prefix: 0 (no heading) + 4 (for "  - ") = 4 spaces
+    (should (string= "    " (markdown-indent-mode-test-wrap-prefix 1)))))
+
+(ert-deftest markdown-indent-mode-test-blockquote-wrap-prefix-no-heading ()
+  "Blockquote `wrap-prefix' preserves leading spaces even with no heading."
+  (markdown-indent-mode-test-with-buffer "  > quote\n"
+    (should (string= "" (markdown-indent-mode-test-line-prefix 1)))
+    ;; wrap-prefix: 0 (no heading) + "  > " (2 leading spaces + "> ")
+    (should (string= "  > " (markdown-indent-mode-test-wrap-prefix 1)))))
+
 ;;; Mode disable
 
 (ert-deftest markdown-indent-mode-test-disable-removes-properties ()

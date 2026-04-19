@@ -58,6 +58,11 @@ The foreground color matches the background to make hashes invisible."
 (defconst markdown-indent--fence-regexp "^\\(`\\{3,\\}\\|~\\{3,\\}\\)"
   "Regular expression matching the start or end of a code fence.")
 
+(defconst markdown-indent--blockquote-regexp
+  "^\\([ \t]*\\)>[ \t]*"
+  "Regular expression matching a Markdown blockquote line.
+Group 1 captures the leading whitespace before `>'.")
+
 (defconst markdown-indent--list-item-regexp
   "^[ \t]*\\(?:[-*+]\\|[0-9]+[.)]\\)[ \t]+"
   "Regular expression matching a Markdown list item line.
@@ -146,11 +151,14 @@ Return `point-max' if no such heading exists."
             (forward-line))
           (point-max))))))
 
-(defun markdown-indent-set-line-properties (level indentation)
+(defun markdown-indent-set-line-properties (level indentation &optional wrap-string)
   "Set prefix properties on current line at LEVEL with wrap INDENTATION.
+If WRAP-STRING is non-nil, use it as the wrap suffix instead of spaces.
 Advance to the next line."
   (let* ((line (propertize (make-string (* 2 level) ?\s) 'face 'markdown-indent-mode))
-         (wrap (propertize (make-string (+ (* 2 level) indentation) ?\s) 'face 'markdown-indent-mode)))
+         (wrap (propertize (concat (make-string (* 2 level) ?\s)
+                                   (or wrap-string (make-string indentation ?\s)))
+                           'face 'markdown-indent-mode)))
     (add-text-properties (line-beginning-position) (line-beginning-position 2)
                          `(line-prefix ,line wrap-prefix ,wrap)))
   (forward-line))
@@ -176,16 +184,16 @@ Advance to the next line."
                                      `(line-prefix ,prefix wrap-prefix ,prefix))
                 (setq level nstars)
                 (forward-line)))
+             ((and (not in-fence) (looking-at markdown-indent--list-item-regexp))
+              (markdown-indent-set-line-properties level (- (match-end 0) (line-beginning-position))))
+             ((and (not in-fence) (looking-at markdown-indent--blockquote-regexp))
+              (markdown-indent-set-line-properties level 0 (concat (match-string 1) "> ")))
              ((zerop level)
               (remove-text-properties (line-beginning-position) (line-beginning-position 2)
                                       '(line-prefix nil wrap-prefix nil))
               (forward-line))
              (t
-              (let ((body-column
-                     (if (looking-at markdown-indent--list-item-regexp)
-                         (- (match-end 0) (line-beginning-position))
-                       (current-indentation))))
-                (markdown-indent-set-line-properties level body-column))))))))))
+              (markdown-indent-set-line-properties level (current-indentation))))))))))
 
 (defvar markdown-indent-mode)
 
