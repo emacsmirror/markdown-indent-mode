@@ -44,3 +44,10 @@ This package works similarly to `org-indent-mode`:
 2. Uses font-lock to hide leading hash symbols (making them match the background color)
 3. Updates indentation dynamically as you edit
 4. Only modifies display properties, not actual buffer content
+
+## Known Conflicts
+
+This mode sets `line-prefix` and `wrap-prefix` text properties on every line. Other modes that also set these properties will conflict — whichever runs last wins, and the result may be incorrect indentation. Here are the known conflicting modes:
+
+- `visual-wrap-prefix-mode` (https://github.com/whhone/markdown-indent-mode/issues/3)
+- `adaptive-wrap-prefix-mode` (https://github.com/whhone/markdown-indent-mode/issues/2)
