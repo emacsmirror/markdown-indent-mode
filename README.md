@@ -1,5 +1,7 @@
 # markdown-indent-mode
 
+[![MELPA](https://melpa.org/packages/markdown-indent-mode-badge.svg)](https://melpa.org/#/markdown-indent-mode)
+
 An Emacs minor mode for dynamic virtual indentation in Markdown, similar to `org-indent-mode` in Org mode.
 
 | Before | After |
