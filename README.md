@@ -4,21 +4,22 @@
 
 An Emacs minor mode for dynamic virtual indentation in Markdown, similar to `org-indent-mode` in Org mode.
 
-| Before | After |
-|--------|-------|
-| ![markdown-indent-mode off](screenshots/markdown-indent-mode-off.png) | ![markdown-indent-mode on](screenshots/markdown-indent-mode-on.png) |
+|Before                                                               |After                                                              |
+|---------------------------------------------------------------------|-------------------------------------------------------------------|
+|![markdown-indent-mode off](screenshots/markdown-indent-mode-off.png)|![markdown-indent-mode on](screenshots/markdown-indent-mode-on.png)|
 
 ## Features
 
 - Automatically indents content based on Markdown heading levels
 - Hides leading hash symbols — only the last `#` is visible in headings (e.g., `###` appears as `  #`)
 - Visual indentation using text properties (doesn't modify actual buffer content)
+- It works with both `markdown-mode` and `markdown-ts-mode`.
 
 ## Installation
 
 ```elisp
 (use-package markdown-indent-mode
-  :hook (markdown-mode . markdown-indent-mode))
+  :hook ((markdown-mode markdown-ts-mode) . markdown-indent-mode))
 ```
 
 ## Usage
@@ -33,7 +34,7 @@ When enabled, content under headings is visually indented to align with the head
 
 ## Development
 
-```
+```sh
 make test   # run ERT tests
 make lint   # run checkdoc on both .el files
 ```
